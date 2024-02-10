@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import {BaseDirectory, createDir, exists, readTextFile, writeTextFile} from "@tauri-apps/api/fs";
+import {onBeforeMount} from "vue";
+
 interface Props {
     en: string
     ru: string

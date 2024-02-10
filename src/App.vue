@@ -1,43 +1,55 @@
 <script setup lang="ts">
-import {computed, Ref, ref} from "vue";
+import {computed, onBeforeMount, Ref, ref} from "vue";
 
 import Card from "./components/Card.vue";
+import {BaseDirectory, createDir, exists, readTextFile, writeTextFile} from "@tauri-apps/api/fs";
 
-const cards: Ref<{en: string, ru: string}[]> = ref([
-    {en: "English", ru: "английский"},
-    {en: "I", ru: "я"},
-    {en: "can", ru: "мочь"},
-    {en: "understand", ru: "понимать"},
-    {en: "you", ru: "ты, тебе, вы, вам"},
-    {en: "it", ru: "это"},
-    {en: "very", ru: "очень"},
-    {en: "well", ru: "хорошо"},
-    {en: "work", ru: "работа, работать"},
-    {en: "study", ru: "учиться"},
-    {en: "and", ru: "и"},
-    {en: "learn", ru: "учиться, изучать"},
-    {en: "like", ru: "нравиться"},
-    {en: "this", ru: "этот"},
-    {en: "online", ru: "онлайн"},
-    {en: "place", ru: "место"},
-    {en: "city", ru: "город"},
-    {en: "live", ru: "жить"},
-    {en: "in", ru: "в"},
-    {en: "in", ru: "в"},
-    {en: "Russia", ru: "Россия"},
-    {en: "New York", ru: "Нью-Йорк"},
-    {en: "country", ru: "страна"},
-]);
+interface Word {
+    en: string
+    ru: string
+}
+
+const words: Ref<Word[]> = ref([]);
 
 const query = ref("");
 
-const result = computed(() => cards.value.filter(card => card.en.toLowerCase().includes(query.value.toLowerCase())))
+const result = computed(() => words.value.filter(word => {
+    const lowerCaseQuery = query.value.toLowerCase();
+
+    const a = word.en.toLowerCase().startsWith(lowerCaseQuery);
+    const b = word.ru.toLowerCase().startsWith(lowerCaseQuery);
+
+    return a || b;
+}))
 
 function shuffle() {
-    cards.value = cards.value.map(value => ({ value, sort: Math.random() }))
+    words.value = words.value.map(value => ({ value, sort: Math.random() }))
         .sort((a, b) => a.sort - b.sort)
         .map(({ value }) => value)
 }
+
+async function initWords() {
+    const config = {dir: BaseDirectory.Document};
+    const wordsPath = "Dictionary/words.json";
+
+    try {
+        await createDir("Dictionary", {
+            dir: BaseDirectory.Document,
+            recursive: true
+        });
+
+        if (!await exists(wordsPath, config))
+            await writeTextFile(wordsPath, "[]", config);
+
+        const json = await readTextFile(wordsPath, config);
+
+        words.value = JSON.parse(json);
+    } catch (exception) {
+        console.error(exception);
+    }
+}
+
+onBeforeMount(() => initWords())
 </script>
 
 <template>
