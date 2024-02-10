@@ -1,0 +1,23 @@
+:root {
+    background-color: var(--BG-500);
+
+    overflow-x: hidden;
+}
+
+::selection {
+    color: var(--BG-500);
+
+    background-color: var(--ACCENT);
+}
+
+::-webkit-scrollbar {
+    width: 2px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--BG-500);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--ACCENT);
+}
