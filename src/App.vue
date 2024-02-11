@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import {BaseDirectory, createDir, exists, readTextFile, writeTextFile} from "@tauri-apps/api/fs";
 import {computed, onBeforeMount, Ref, ref} from "vue";
 
 import Card from "./components/Card.vue";
-import {BaseDirectory, createDir, exists, readTextFile, writeTextFile} from "@tauri-apps/api/fs";
 
 interface Word {
     en: string
@@ -23,7 +23,7 @@ const result = computed(() => words.value.filter(word => {
 }))
 
 function shuffle() {
-    words.value = words.value.map(value => ({ value, sort: Math.random() }))
+    words.value = words.value.map(value => ({value, sort: Math.random()}))
         .sort((a, b) => a.sort - b.sort)
         .map(({ value }) => value)
 }
@@ -67,7 +67,7 @@ onBeforeMount(() => initWords())
     </header>
 
     <TransitionGroup tag="div" name="fade" class="cards">
-        <Card v-for="card in result" :key="card" :en="card.en" :ru="card.ru" />
+        <Card v-for="word in result" :key="word.en" :en="word.en" :ru="word.ru" />
     </TransitionGroup>
 </template>
 
